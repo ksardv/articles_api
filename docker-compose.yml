@@ -1,0 +1,48 @@
+version: "3"
+services:
+
+  articles_api:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: articles_api
+    restart: unless-stopped
+    working_dir: /var/www/articles_api
+    depends_on:
+        - db
+    volumes:
+        - ./:/var/www/articles_api
+    networks:
+        - articles
+
+  db:
+    image: "mariadb"
+    container_name: articles_api_db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_USER=$DB_USER
+      - MYSQL_PASSWORD=$DB_PASS
+      - MYSQL_DATABASE=$DB_NAME
+      - MYSQL_ROOT_PASSWORD=password
+    networks:
+      - articles  
+  
+  nginx:
+    image: "nginx:alpine"
+    container_name: articles_api_nginx
+    restart: unless-stopped
+    working_dir: /var/www/articles_api
+    volumes:
+        - ./:/var/www/articles_api
+        - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+        - articles
+
+networks:
+    articles:
+        driver: bridge
