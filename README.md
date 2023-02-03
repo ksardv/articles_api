@@ -3,8 +3,7 @@
 3. run `docker compose up -d`
 4. run `docker exec -it articles_api composer install`
 5. the api should be accessible on localhost
-6. run the migrations
-
+6. run the migrations `docker exec -it articles_api php bin/console doctrine:migrations:migrate`
 7. to run php unit tests:
 ```
 php bin/phpunit
