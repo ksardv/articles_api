@@ -3,12 +3,16 @@
 namespace App\Entity;
 
 use App\Repository\ArticleRepository;
-use JMS\Serializer\Annotation as Serializer;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
- * @ORM\Entity(repositoryClass=ArticleRepository::class)
- * @Serializer\ExclusionPolicy("all")
+ * @ORM\Entity
+ * @ORM\HasLifecycleCallbacks
+ * @Serializer\ExclusionPolicy("all") 
  */
 class Article
 {
@@ -21,8 +25,9 @@ class Article
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Serializer\Expose()
-     * @Serializer\Type("string")
+     * @Serializer\Expose()     
+     * @Serializer\Type("string")  
+     * @Assert\NotBlank
      * 
      * @var string
      */
@@ -30,8 +35,9 @@ class Article
 
     /**
      * @ORM\Column(type="string", length=2500)
-     * @Serializer\Expose()
-     * @Serializer\Type("string")
+     * @Serializer\Expose()     
+     * @Serializer\Type("string")  
+     * @Assert\NotBlank
      * 
      * @var string
      */
@@ -39,8 +45,9 @@ class Article
 
     /**
      * @ORM\Column(type="string", length=50)
-     * @Serializer\Expose()
-     * @Serializer\Type("string")
+     * @Serializer\Expose()     
+     * @Serializer\Type("string")  
+     * @Assert\NotBlank
      * 
      * @var string
      */
@@ -48,10 +55,12 @@ class Article
 
     /**
      * @ORM\Column(type="datetime")
-     * @Serializer\Expose()
-     * @Serializer\Type("DateTimeInterface")
+     * @Serializer\Expose()     
+     * @Serializer\Type("DateTime")  
+     * @Assert\NotBlank
      * 
      * @var \DateTimeInterface
+     * 
      */
     private $publish_at;
 
@@ -123,5 +132,18 @@ class Article
         $this->created_at = $created_at;
 
         return $this;
+    }
+
+    /**
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     */
+    public function updatedTimestamps(): void
+    {
+        $dateTimeNow = new DateTime('now');
+
+        if ($this->getCreatedAt() === null) {
+            $this->setCreatedAt($dateTimeNow);
+        }
     }
 }
